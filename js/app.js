@@ -2,19 +2,95 @@
    LOST MOUNTAIN — customizer + shared site behaviour (vanilla)
    ============================================================ */
 (function () {
-  /* ---------- shared: nav scroll, reveal, year ---------- */
+  /* ---------- shared: nav, reveal, parallax, motion ---------- */
+  const REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
   function shared() {
     const nav = document.querySelector('.nav');
     if (nav) {
       const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 30);
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
+      // mobile hamburger menu
+      const toggle = document.getElementById('nav-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const open = nav.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        nav.querySelectorAll('.nav-links a').forEach((a) => a.addEventListener('click', () => {
+          nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false');
+        }));
+      }
     }
+
+    // staggered reveal-on-scroll
+    document.querySelectorAll('.steps, .reviews, .values, .masonry, .stat-band, .flow, .r-stats, .hero-cta, .cta-band .actions')
+      .forEach((group) => [...group.children].forEach((child, i) => { child.style.transitionDelay = (i * 75) + 'ms'; }));
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in'); });
-    }, { threshold: 0.12 });
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
     document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
     document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
+
+    // parallax background + scroll-linked bottle drift (rAF-throttled, never traps scroll)
+    if (!REDUCE) {
+      const topo = document.querySelector('.topo-bg');
+      let ticking = false;
+      const onFx = () => {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => {
+          const y = window.scrollY || 0;
+          if (topo) topo.style.backgroundPositionY = (y * 0.14) + 'px';
+          if (window.LostBottle && LostBottle.setScrollSpin) LostBottle.setScrollSpin(y * 0.0006);
+          ticking = false;
+        });
+      };
+      window.addEventListener('scroll', onFx, { passive: true });
+      onFx();
+
+      // magnetic primary buttons (fine pointer only)
+      if (FINE) {
+        document.querySelectorAll('.btn-primary').forEach((btn) => {
+          btn.addEventListener('mousemove', (e) => {
+            const r = btn.getBoundingClientRect();
+            btn.style.transform = 'translate(' + (e.clientX - (r.left + r.width / 2)) * 0.16 + 'px,' +
+              (e.clientY - (r.top + r.height / 2)) * 0.26 + 'px)';
+          });
+          btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+        });
+      }
+    }
+
+    // customizer slide-in (home): open on intent, close on ✕ / Escape
+    const stage = document.getElementById('stage');
+    if (stage && document.getElementById('customize')) {
+      const open = () => stage.classList.add('designing');
+      const close = () => stage.classList.remove('designing');
+      document.querySelectorAll('[data-open-customizer]').forEach((b) => b.addEventListener('click', (e) => {
+        e.preventDefault(); open();
+        document.getElementById('customize').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }));
+      const cb = document.getElementById('close-customizer');
+      cb && cb.addEventListener('click', close);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    }
+  }
+
+  /* animate a price number toward a target */
+  function animateCount(el, from, to, dur) {
+    if (!el) return;
+    if (REDUCE) { el.textContent = to; return; }
+    const start = performance.now();
+    function step(now) {
+      const k = Math.min(1, (now - start) / dur);
+      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // easeInOut
+      el.textContent = Math.round(from + (to - from) * e);
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
   /* ---------- vectorizer: image -> 2-tone ink mask ---------- */
@@ -60,6 +136,7 @@
       qty: document.getElementById('qty'),
       qtyVal: document.getElementById('qty-val'),
       price: document.getElementById('price'),
+      priceAmt: document.getElementById('price-amt'),
       buy: document.getElementById('buy'),
       reset: document.getElementById('reset-view'),
       swatches: document.querySelectorAll('[data-bottle]'),
@@ -141,12 +218,13 @@
 
     // quantity + price
     let qty = 1;
+    let shownTotal = UNIT;
     function renderPrice() {
       els.qtyVal && (els.qtyVal.textContent = String(qty).padStart(2, '0'));
-      const total = qty * UNIT;
       const unit = qty >= 12 ? 41 : qty >= 5 ? 44 : UNIT;
       const t = qty * unit;
-      if (els.price) els.price.textContent = '$' + t.toFixed(0);
+      if (els.priceAmt) { animateCount(els.priceAmt, shownTotal, t, 380); shownTotal = t; }
+      else if (els.price) els.price.textContent = '$' + t;
     }
     document.querySelectorAll('[data-qty]').forEach((b) => b.addEventListener('click', () => {
       qty = Math.max(1, Math.min(99, qty + (+b.dataset.qty)));

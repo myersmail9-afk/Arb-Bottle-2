@@ -281,44 +281,43 @@
     State.hoverGlow.position.set(0, 0.1, 0);
     scene.add(State.hoverGlow);
 
-    // controls — rotate only; we drive zoom manually so page scroll is free
+    // controls
     const ctr = new THREE.OrbitControls(cam, canvas);
     ctr.enableDamping = true; ctr.dampingFactor = 0.08;
     ctr.enablePan = false;
-    ctr.enableZoom = false;
+    ctr.enableZoom = true; ctr.zoomSpeed = 0.85;
     ctr.minDistance = DIST_MIN; ctr.maxDistance = DIST_MAX;
     ctr.autoRotate = true; ctr.autoRotateSpeed = 0.55;
     ctr.rotateSpeed = 0.85;
     ctr.minPolarAngle = 0.55; ctr.maxPolarAngle = 2.35;
     ctr.target.set(TARGET.x, TARGET.y, TARGET.z);
+    // one finger rotates, two-finger pinch zooms (no pan)
+    if (THREE.TOUCH) ctr.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
     ctr.addEventListener('start', () => { ctr.autoRotate = false; State.dragging = true; });
     ctr.addEventListener('end', () => { State.dragging = false; });
     State.controls = ctr;
 
-    // Canvas is click-through by default; we flip it interactive only while
-    // the pointer is over/near the bottle, so the page stays easy to scroll.
-    canvas.style.pointerEvents = 'none';
-    const setInteractive = (on) => {
-      canvas.style.pointerEvents = on ? 'auto' : 'none';
-      canvas.style.cursor = on ? 'grab' : 'default';
-    };
-    window.addEventListener('mousemove', (e) => {
-      if (State.dragging) return;
-      setInteractive(isOverBottle(e.clientX, e.clientY, 0.75));
-    });
-    // Touch: best-effort — make interactive when a touch lands on the bottle.
-    window.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'touch') setInteractive(isOverBottle(e.clientX, e.clientY, 0.9));
-    }, true);
-    // Wheel zoom — only when over the bottle (and not over UI chrome);
-    // otherwise let the event through so the page scrolls.
-    window.addEventListener('wheel', (e) => {
-      if (!State.ready) return;
-      if (e.target && e.target.closest && e.target.closest('.customizer, .nav, .twk-panel')) return;
-      if (!isOverBottle(e.clientX, e.clientY, 0.85)) return;
-      e.preventDefault();
-      dolly(e.deltaY);
-    }, { passive: false });
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    if (coarse) {
+      // Touch / iPhone: the canvas handles the bottle (drag to rotate,
+      // pinch to zoom). touch-action:pan-y overrides OrbitControls' default
+      // so a vertical swipe still scrolls the page — it never traps scroll.
+      canvas.style.pointerEvents = 'auto';
+      canvas.style.touchAction = 'pan-y';
+    } else {
+      // Desktop: canvas is click-through except when the cursor is over (or
+      // near) the bottle — so drag-rotate and wheel-zoom only engage there,
+      // and scrolling anywhere else moves the page normally.
+      canvas.style.pointerEvents = 'none';
+      const setInteractive = (on) => {
+        canvas.style.pointerEvents = on ? 'auto' : 'none';
+        canvas.style.cursor = on ? 'grab' : 'default';
+      };
+      window.addEventListener('mousemove', (e) => {
+        if (State.dragging) return;
+        setInteractive(isOverBottle(e.clientX, e.clientY, 0.75));
+      });
+    }
 
     applyEngraveMatProps();
     resize();
@@ -357,16 +356,6 @@
     const y = o.y + t * d.y;
     const gy = State.group ? State.group.position.y : 0;
     return y >= gy - 0.4 && y <= gy + 5.1;
-  }
-
-  function dolly(deltaY) {
-    if (!State.controls) return;
-    const t = State.controls.target;
-    const offset = State.camera.position.clone().sub(t);
-    let dist = offset.length();
-    dist = Math.max(DIST_MIN, Math.min(DIST_MAX, dist * Math.exp(deltaY * 0.0014)));
-    offset.setLength(dist);
-    State.camera.position.copy(t).add(offset);
   }
 
   function makeContactShadow() {
@@ -416,12 +405,17 @@
     if (State.group) {
       State.group.position.y = State.baseY + Math.sin(t * 0.85) * 0.07;
       State.group.rotation.z = Math.sin(t * 0.5) * 0.008;
+      // gentle scroll-linked drift — reacts to the page without trapping scroll
+      State.group.rotation.y += ((State.scrollSpin || 0) - State.group.rotation.y) * 0.06;
     }
     if (State.hoverGlow) State.hoverGlow.material.opacity = 0.38 + Math.sin(t * 0.85) * 0.07;
     State.controls && State.controls.update();
     State.renderer.render(State.scene, State.camera);
   }
 
+  window.LostBottle.setScrollSpin = function (rad) {
+    State.scrollSpin = rad || 0;
+  };
   window.LostBottle.setArt = function (artCanvasOrImg) {
     State.sourceArt = artCanvasOrImg || null;
     drawSleeve();
