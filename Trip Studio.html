@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trip Studio — Lost Mountain</title>
+<meta name="description" content="Drop in up to five photos from a trip and Trip Studio composes them into a single black-and-white drawing built for laser engraving — all on your device." />
+<link rel="stylesheet" href="css/lost.css" />
+<style>
+  .ts-hero{ padding:clamp(120px,18vh,180px) var(--pad) 0; }
+  .ts-hero .wrap{ max-width:900px; }
+  .ts-hero h1{ font-size:clamp(40px,7vw,86px); }
+  .ts-hero .lead{ margin-top:22px; }
+
+  .workspace{ display:grid; grid-template-columns:420px 1fr; gap:34px; align-items:start; }
+  .ws-panel{ padding:26px; display:flex; flex-direction:column; gap:22px; position:sticky; top:96px; }
+  .ws-panel .step-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:8px; }
+  .ws-panel .step-label b{ color:var(--accent); font-weight:400; }
+
+  .ts-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .ts-slot{ aspect-ratio:1; border-radius:var(--r-md); background-size:cover; background-position:center; position:relative; cursor:pointer; transition:.2s; }
+  .ts-slot.empty{ border:1.5px dashed var(--glass-line); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--ink-faint); }
+  .ts-slot.empty:hover{ border-color:var(--accent); color:var(--accent); }
+  .ts-slot.empty span{ font-size:24px; font-weight:300; }
+  .ts-slot.empty small{ font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; }
+  .ts-slot.filled{ border:1px solid var(--glass-line); box-shadow:inset 0 0 0 1px rgba(0,0,0,.4); }
+  .ts-x{ position:absolute; top:5px; right:5px; width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(7,9,12,.75); color:#fff; font-size:14px; line-height:1; }
+
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-dim); }
+  .field input[type=text]{ background:rgba(255,255,255,.04); border:1px solid var(--glass-line); border-radius:10px; padding:11px 13px; color:var(--ink); font-family:var(--font-body); font-size:14px; outline:none; }
+  .field input[type=text]:focus{ border-color:var(--accent); }
+
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:4px; background:linear-gradient(90deg,var(--accent) var(--p,50%),rgba(255,255,255,.12) var(--p,50%)); outline:none; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--ink); border:3px solid var(--accent); cursor:pointer; box-shadow:0 0 10px var(--accent-glow); }
+
+  .seg{ display:flex; background:rgba(255,255,255,.04); border:1px solid var(--glass-line); border-radius:var(--r-pill); padding:3px; gap:3px; }
+  .seg button{ flex:1; font-family:var(--font-body); font-weight:700; font-size:12px; color:var(--ink-dim); background:transparent; border:none; padding:9px 10px; border-radius:var(--r-pill); cursor:pointer; transition:.2s; }
+  .seg button.active{ background:var(--accent); color:var(--accent-ink); }
+
+  .ts-result{ border-radius:var(--r-lg); border:1px solid var(--glass-line); min-height:620px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+    background:radial-gradient(120% 100% at 50% 0,rgba(255,255,255,.03),transparent); }
+  #ts-empty{ display:flex; flex-direction:column; align-items:center; gap:16px; color:var(--ink-faint); text-align:center; padding:40px; }
+  #ts-empty .big{ font-family:var(--font-display); font-size:22px; color:var(--ink-dim); }
+  .ts-load{ display:flex; flex-direction:column; align-items:center; gap:18px; font-family:var(--font-mono); font-size:12px; letter-spacing:.2em; color:var(--accent); }
+  .ts-ring{ width:46px; height:46px; border-radius:50%; border:2px solid var(--glass-line); border-top-color:var(--accent); animation:spin 0.9s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  #ts-out{ max-width:78%; max-height:580px; margin:30px auto; display:none; border-radius:6px; box-shadow:0 30px 80px -20px rgba(0,0,0,.8); transition:filter .3s, background .3s; }
+  .ts-result.done #ts-out{ display:block; }
+  #ts-out.engraved{ filter:invert(1) brightness(.9) contrast(1.1); border-radius:6px; }
+  #ts-actions{ display:none; gap:12px; flex-wrap:wrap; margin-top:22px; }
+
+  .ws-note{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; color:var(--ink-faint); line-height:1.7; }
+  .gen-btn{ width:100%; justify-content:center; }
+  .gen-btn:disabled{ opacity:.4; cursor:not-allowed; }
+
+  @media (max-width:980px){ .workspace{ grid-template-columns:1fr; } .ws-panel{ position:relative; top:0; } #ts-out{ max-width:90%; } }
+</style>
+</head>
+<body>
+<div class="void-bg"></div>
+<div class="topo-bg"></div>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/lost-logo-light.png" alt="Lost Mountain" />
+    <span class="wm">LOST MOUNTAIN <span>engraving</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Customize</a>
+    <a href="Trip Studio.html" class="active">Trip Studio</a>
+    <a href="The Process.html">Process</a>
+    <a href="About.html">About</a>
+    <a href="Reviews.html">Reviews</a>
+  </div>
+  <div class="nav-cta"><a class="btn btn-ghost" href="index.html">Customize a Bottle</a></div>
+</nav>
+
+<section class="ts-hero">
+  <div class="wrap">
+    <span class="eyebrow">AI Trip Studio · Beta</span>
+    <h1 class="display" style="margin-top:18px;">Five photos.<br>One story. One bottle.</h1>
+    <p class="lead">Drop in the frames from a trip — a ridgeline, a campfire, the summit sign. Trip Studio composes them into a single black-and-white drawing built for the laser. Tune it, then send it straight to your bottle.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:54px;">
+  <div class="wrap">
+    <div class="workspace">
+      <!-- CONTROLS -->
+      <aside class="ws-panel glass">
+        <div class="step-label"><b>01</b> ADD UP TO 5 PHOTOS · <span id="ts-count">00</span></div>
+        <div class="ts-grid" id="ts-grid"></div>
+
+        <div class="divider"></div>
+        <div class="field">
+          <label>Trip Title</label>
+          <input type="text" id="ts-title" placeholder="Zion, March '26" maxlength="32" />
+        </div>
+        <div class="field">
+          <label>Coordinates / Subtitle</label>
+          <input type="text" id="ts-coords" placeholder="37.2982° N, 113.0263° W" maxlength="40" />
+        </div>
+
+        <div class="field">
+          <label>Layout</label>
+          <div class="seg">
+            <button data-layout="stack" class="active">Stack</button>
+            <button data-layout="horizon">Horizon</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Ink contrast</label>
+          <input type="range" id="ts-contrast" min="80" max="200" value="135" />
+        </div>
+
+        <button class="btn btn-primary btn-lg gen-btn" id="ts-generate" disabled>Compose My Trip <span class="ar">→</span></button>
+        <p class="ws-note">Composition runs on your machine — your photos never leave the browser. Output is print-ready 2-tone art, optimized for laser engraving on stainless.</p>
+      </aside>
+
+      <!-- RESULT -->
+      <div>
+        <div class="ts-result" id="ts-result">
+          <div id="ts-empty">
+            <div class="big">Your composite appears here</div>
+            <div class="ws-note">Add a few photos and press Compose.</div>
+          </div>
+          <img id="ts-out" alt="Trip composite" />
+        </div>
+        <div id="ts-actions">
+          <button class="btn btn-primary btn-lg" id="ts-toBottle">Engrave This on a Bottle <span class="ar">→</span></button>
+          <button class="btn btn-ghost btn-lg" id="ts-invert">Preview as Engraved</button>
+          <button class="btn btn-ghost btn-lg" id="ts-download">Download PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="display:flex; align-items:center; gap:12px;">
+        <img src="assets/lost-logo-light.png" alt="" style="height:34px" />
+        <span class="wm" style="font-family:var(--font-display); font-weight:600;">LOST MOUNTAIN</span>
+      </div>
+      <p class="colophon">Custom-engraved bottles for people who go places.</p>
+    </div>
+    <div><h5>Shop</h5><a href="index.html">Customize a Bottle</a><a href="Trip Studio.html">AI Trip Studio</a><a href="#">Corporate / Bulk</a></div>
+    <div><h5>Company</h5><a href="About.html">Our Story</a><a href="The Process.html">The Process</a><a href="Reviews.html">Reviews</a></div>
+    <div><h5>Connect</h5><a href="http://www.instagram.com/lost_mountain_engraving/">Instagram</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span data-year>2026</span> Lost Mountain Engraving · All Rights Reserved</span>
+    <span>41.7370° N, 111.8338° W</span>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script src="js/studio.js"></script>
+</body>
+</html>

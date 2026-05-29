@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Process — Lost Mountain</title>
+<meta name="description" content="How a Lost Mountain bottle is made — from in-browser vectorizing to fiber-laser engraving on 304 stainless — and what artwork engraves beautifully." />
+<link rel="stylesheet" href="css/lost.css" />
+<style>
+  .p-hero{ padding:clamp(120px,18vh,180px) var(--pad) 0; }
+  .p-hero .wrap{ max-width:880px; }
+  .flow{ display:grid; grid-template-columns:repeat(5,1fr); gap:0; margin-top:60px; border:1px solid var(--glass-line); border-radius:var(--r-lg); overflow:hidden; }
+  .flow .node{ padding:30px 24px; border-right:1px solid var(--glass-line-2); position:relative; }
+  .flow .node:last-child{ border-right:none; }
+  .flow .n{ font-family:var(--font-mono); font-size:12px; color:var(--accent); letter-spacing:.2em; }
+  .flow .node h4{ font-size:17px; margin:14px 0 8px; }
+  .flow .node p{ font-size:13px; color:var(--ink-dim); line-height:1.5; }
+  @media (max-width:980px){ .flow{ grid-template-columns:1fr; } .flow .node{ border-right:none; border-bottom:1px solid var(--glass-line-2); } }
+
+  .dd{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:50px; }
+  .dd .col{ padding:32px; }
+  .dd h3{ font-size:22px; display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+  .dd .tick{ width:26px; height:26px; border-radius:50%; display:grid; place-items:center; font-size:14px; }
+  .dd .good .tick{ background:color-mix(in oklab, var(--accent) 22%, transparent); color:var(--accent); }
+  .dd .bad .tick{ background:rgba(255,120,110,.16); color:#ff8d82; }
+  .dd ul{ list-style:none; display:flex; flex-direction:column; gap:14px; }
+  .dd li{ display:flex; gap:12px; font-size:15px; color:var(--ink); }
+  .dd li small{ display:block; color:var(--ink-faint); font-size:13px; margin-top:2px; }
+  .dd li .b{ color:var(--accent); font-family:var(--font-mono); font-size:13px; }
+  .bad li .b{ color:#ff8d82; }
+  @media (max-width:860px){ .dd{ grid-template-columns:1fr; } }
+
+  .band{ position:relative; border-radius:var(--r-lg); overflow:hidden; min-height:420px; display:flex; align-items:flex-end; margin-top:30px; }
+  .band image-slot{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .band .scrim{ position:absolute; inset:0; background:linear-gradient(to top, rgba(7,9,12,.92), rgba(7,9,12,.15) 60%, transparent); z-index:1; }
+  .band .bc{ position:relative; z-index:2; padding:44px; max-width:620px; }
+  .band h2{ font-size:clamp(26px,3.6vw,42px); }
+  .band p{ color:var(--ink-dim); margin-top:14px; }
+</style>
+</head>
+<body>
+<div class="void-bg"></div>
+<div class="topo-bg"></div>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/lost-logo-light.png" alt="Lost Mountain" />
+    <span class="wm">LOST MOUNTAIN <span>engraving</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Customize</a>
+    <a href="Trip Studio.html">Trip Studio</a>
+    <a href="The Process.html" class="active">Process</a>
+    <a href="About.html">About</a>
+    <a href="Reviews.html">Reviews</a>
+  </div>
+  <div class="nav-cta"><a class="btn btn-ghost" href="index.html">Customize a Bottle</a></div>
+</nav>
+
+<section class="p-hero">
+  <div class="wrap">
+    <span class="eyebrow">From your screen to the trailhead</span>
+    <h1 class="display" style="margin-top:18px; font-size:clamp(40px,7vw,86px);">The Process</h1>
+    <p class="lead" style="margin-top:22px;">A fiber laser doesn't print — it permanently marks the steel itself. That's why a Lost Mountain bottle never peels, fades, or scratches off. Here's the whole path, from upload to your hands.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:40px;">
+  <div class="wrap">
+    <div class="flow reveal">
+      <div class="node"><div class="n">01</div><h4>Design</h4><p>Draw it, photograph it, or build it in Trip Studio. Two-tone is the language of the laser.</p></div>
+      <div class="node"><div class="n">02</div><h4>Vectorize</h4><p>Your browser converts the image to clean laser paths in real time — no design software, no proof emails.</p></div>
+      <div class="node"><div class="n">03</div><h4>Place</h4><p>Preview the art on the live 3D bottle — wrap the full 360° or keep it to one face. What you spin is what gets made.</p></div>
+      <div class="node"><div class="n">04</div><h4>Engrave</h4><p>The file routes to the laser. We mark, clean, and inspect every bottle by hand.</p></div>
+      <div class="node"><div class="n">05</div><h4>Ship</h4><p>Packed in a kraft tube with a coordinate card, on its way in five days.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" style="display:block; margin-bottom:14px;">Design for steel</span>
+      <h2 style="font-size:clamp(28px,4vw,46px);">What engraves beautifully — and what fights the laser.</h2>
+      <p class="lead" style="margin-top:16px;">The laser sees contrast, not color. Bold and graphic wins. If you're not sure, the threshold slider on the bottle tells you instantly.</p>
+    </div>
+    <div class="dd">
+      <div class="col glass good reveal">
+        <h3><span class="tick">✓</span> Engraves clean</h3>
+        <ul>
+          <li><div><span class="b">High contrast.</span> Bold shapes and clear edges.<small>Logos, silhouettes, line drawings, topo lines.</small></div></li>
+          <li><div><span class="b">Single-line art.</span> Sketches and signatures.<small>Like the Lost Mountain mark itself.</small></div></li>
+          <li><div><span class="b">Solid type.</span> Medium-to-heavy weights.<small>Coordinates, names, short phrases.</small></div></li>
+          <li><div><span class="b">Strong photos.</span> Clear subject, simple background.<small>A ridgeline against sky, a portrait in good light.</small></div></li>
+        </ul>
+      </div>
+      <div class="col glass bad reveal">
+        <h3><span class="tick">✕</span> Fights the steel</h3>
+        <ul>
+          <li><div><span class="b">Smooth gradients.</span> No tonal range on metal.<small>Sunsets and soft fades flatten out.</small></div></li>
+          <li><div><span class="b">Hair-thin detail.</span> Sub-millimeter lines drop out.<small>Tiny serif text, fine crosshatch, watermarks.</small></div></li>
+          <li><div><span class="b">Busy photos.</span> Cluttered scenes turn to mud.<small>Crowds, dense foliage, low light.</small></div></li>
+          <li><div><span class="b">Color-dependent art.</span> The laser is monochrome.<small>Designs that only read in full color.</small></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="band reveal">
+      <image-slot id="process-band" src="assets/mountains-web.jpg" placeholder="Drop a workshop / lifestyle photo"></image-slot>
+      <div class="scrim"></div>
+      <div class="bc">
+        <span class="pill-tag" style="margin-bottom:16px;">LIFETIME ENGRAVING GUARANTEE</span>
+        <h2>Marked into the metal. Made to outlast the trip.</h2>
+        <p>304 stainless, double-wall vacuum insulation, fiber-laser engraving rated for the life of the bottle — wrapped over the entire surface, top to base, all the way around. If your mark ever fades, we re-do it free.</p>
+        <a class="btn btn-primary btn-lg" href="index.html" style="margin-top:26px;">Start Your Design <span class="ar">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="display:flex; align-items:center; gap:12px;">
+        <img src="assets/lost-logo-light.png" alt="" style="height:34px" />
+        <span class="wm" style="font-family:var(--font-display); font-weight:600;">LOST MOUNTAIN</span>
+      </div>
+      <p class="colophon">Custom-engraved bottles for people who go places.</p>
+    </div>
+    <div><h5>Shop</h5><a href="index.html">Customize a Bottle</a><a href="Trip Studio.html">AI Trip Studio</a><a href="#">Corporate / Bulk</a></div>
+    <div><h5>Company</h5><a href="About.html">Our Story</a><a href="The Process.html">The Process</a><a href="Reviews.html">Reviews</a></div>
+    <div><h5>Connect</h5><a href="http://www.instagram.com/lost_mountain_engraving/">Instagram</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span data-year>2026</span> Lost Mountain Engraving · All Rights Reserved</span>
+    <span>41.7370° N, 111.8338° W</span>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

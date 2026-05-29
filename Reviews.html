@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reviews — Lost Mountain</title>
+<meta name="description" content="What people say about their Lost Mountain bottles — 4.9 stars across 2,400+ engraved bottles carried to 11 countries." />
+<link rel="stylesheet" href="css/lost.css" />
+<style>
+  .r-hero{ padding:clamp(120px,18vh,180px) var(--pad) 0; }
+  .r-hero .wrap{ max-width:820px; }
+  .r-stats{ display:flex; gap:40px; flex-wrap:wrap; margin-top:40px; }
+  .r-stats .s .n{ font-family:var(--font-display); font-size:clamp(30px,4vw,46px); font-weight:600; color:var(--ink); letter-spacing:-.02em; }
+  .r-stats .s .l{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; color:var(--ink-faint); text-transform:uppercase; margin-top:6px; }
+  .r-stats .s .n .star{ color:var(--accent); }
+
+  .featured{ display:grid; grid-template-columns:1fr 1.2fr; gap:0; border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--glass-line); margin-top:54px; }
+  .featured .media{ position:relative; min-height:380px; }
+  .featured image-slot{ position:absolute; inset:0; width:100%; height:100%; }
+  .featured .body{ padding:clamp(30px,4vw,54px); display:flex; flex-direction:column; justify-content:center; gap:20px; }
+  .featured .stars{ color:var(--accent); letter-spacing:4px; }
+  .featured blockquote{ font-family:var(--font-display); font-size:clamp(22px,2.6vw,34px); line-height:1.25; letter-spacing:-.02em; color:var(--ink); }
+  .featured .who{ font-family:var(--font-mono); font-size:12px; letter-spacing:.12em; color:var(--ink-dim); text-transform:uppercase; }
+  @media (max-width:860px){ .featured{ grid-template-columns:1fr; } }
+
+  .masonry{ columns:3; column-gap:22px; margin-top:54px; }
+  .masonry .review{ break-inside:avoid; margin-bottom:22px; padding:26px; display:flex; flex-direction:column; gap:14px; }
+  .review .stars{ color:var(--accent); letter-spacing:3px; font-size:13px; }
+  .review p{ font-size:15px; color:var(--ink); line-height:1.6; }
+  .review .who{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase; }
+  .review .tag{ align-self:flex-start; }
+  @media (max-width:980px){ .masonry{ columns:2; } }
+  @media (max-width:620px){ .masonry{ columns:1; } }
+</style>
+</head>
+<body>
+<div class="void-bg"></div>
+<div class="topo-bg"></div>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/lost-logo-light.png" alt="Lost Mountain" />
+    <span class="wm">LOST MOUNTAIN <span>engraving</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Customize</a>
+    <a href="Trip Studio.html">Trip Studio</a>
+    <a href="The Process.html">Process</a>
+    <a href="About.html">About</a>
+    <a href="Reviews.html" class="active">Reviews</a>
+  </div>
+  <div class="nav-cta"><a class="btn btn-ghost" href="index.html">Customize a Bottle</a></div>
+</nav>
+
+<section class="r-hero">
+  <div class="wrap">
+    <span class="eyebrow">Carried, dented, loved</span>
+    <h1 class="display" style="margin-top:18px; font-size:clamp(40px,7vw,86px);">What people<br>say about theirs.</h1>
+    <div class="r-stats">
+      <div class="s"><div class="n">4.9<span class="star">★</span></div><div class="l">Average rating</div></div>
+      <div class="s"><div class="n">2,400+</div><div class="l">Bottles engraved</div></div>
+      <div class="s"><div class="n">98%</div><div class="l">Would gift again</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:40px;">
+  <div class="wrap">
+    <div class="featured reveal">
+      <div class="media"><image-slot id="rev-feature" src="assets/mountains-web.jpg" placeholder="Drop a customer / product photo"></image-slot></div>
+      <div class="body">
+        <div class="stars">★★★★★</div>
+        <blockquote>"I put the GPS track from my Appalachian Trail thru-hike on a Carbon bottle. Six months later, strangers still stop me at trailheads to ask about it."</blockquote>
+        <div class="who">— Dana R. · Asheville, NC · AT '25</div>
+      </div>
+    </div>
+
+    <div class="masonry">
+      <div class="review glass reveal"><span class="pill-tag tag">CORPORATE</span><div class="stars">★★★★★</div><p>"Ordered 40 for a leadership summit. The live preview meant zero proofing emails and zero mistakes. They showed up flawless and everyone wanted to know where they were from."</p><div class="who">— Mateo L. · Ops, Northpeak</div></div>
+      <div class="review glass reveal"><span class="pill-tag tag">GIFT</span><div class="stars">★★★★★</div><p>"Turned my kid's crayon drawing of our campsite into an etched bottle. I will never not tear up using it."</p><div class="who">— Priya S. · Bend, OR</div></div>
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"The Trip Studio thing is witchcraft. Dropped in five photos from Patagonia and got back a drawing that looks like an old expedition poster."</p><div class="who">— Tomas K. · Boulder, CO</div></div>
+      <div class="review glass reveal"><span class="pill-tag tag">WEDDING</span><div class="stars">★★★★★</div><p>"Did our coordinates and the date for 60 wedding favors. Guests are still texting photos of theirs in the wild a year later."</p><div class="who">— Hannah &amp; Joon · SLC, UT</div></div>
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"I've dropped this bottle off three peaks now. Scratched to hell, but the engraving is exactly as crisp as day one."</p><div class="who">— Wes A. · Jackson, WY</div></div>
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"Most engraving sites feel like 2009. This felt like the future. Spun the bottle around for ten minutes before I even uploaded anything."</p><div class="who">— Lena M. · Portland, OR</div></div>
+    </div>
+
+    <div class="center" style="margin-top:60px;">
+      <a class="btn btn-primary btn-lg reveal" href="index.html">Make Yours <span class="ar">→</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="display:flex; align-items:center; gap:12px;">
+        <img src="assets/lost-logo-light.png" alt="" style="height:34px" />
+        <span class="wm" style="font-family:var(--font-display); font-weight:600;">LOST MOUNTAIN</span>
+      </div>
+      <p class="colophon">Custom-engraved bottles for people who go places.</p>
+    </div>
+    <div><h5>Shop</h5><a href="index.html">Customize a Bottle</a><a href="Trip Studio.html">AI Trip Studio</a><a href="#">Corporate / Bulk</a></div>
+    <div><h5>Company</h5><a href="About.html">Our Story</a><a href="The Process.html">The Process</a><a href="Reviews.html">Reviews</a></div>
+    <div><h5>Connect</h5><a href="http://www.instagram.com/lost_mountain_engraving/">Instagram</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span data-year>2026</span> Lost Mountain Engraving · All Rights Reserved</span>
+    <span>41.7370° N, 111.8338° W</span>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

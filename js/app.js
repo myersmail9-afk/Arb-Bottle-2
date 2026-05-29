@@ -64,6 +64,7 @@
       reset: document.getElementById('reset-view'),
       swatches: document.querySelectorAll('[data-bottle]'),
       engraveBtns: document.querySelectorAll('[data-engrave]'),
+      coverageBtns: document.querySelectorAll('[data-coverage]'),
       designState: document.getElementById('design-state'),
     };
 
@@ -129,6 +130,13 @@
       els.engraveBtns.forEach((s) => s.classList.remove('active'));
       b.classList.add('active');
       LostBottle.setEngraveStyle(b.dataset.engrave);
+    }));
+
+    // coverage: full-wrap vs single panel
+    els.coverageBtns.forEach((b) => b.addEventListener('click', () => {
+      els.coverageBtns.forEach((s) => s.classList.remove('active'));
+      b.classList.add('active');
+      LostBottle.setCoverage && LostBottle.setCoverage(b.dataset.coverage);
     }));
 
     // quantity + price

@@ -117,9 +117,29 @@
   .step p{ color:var(--ink-dim); font-size:14.5px; }
 
   .feature{ display:grid; grid-template-columns:1.05fr .95fr; gap:54px; align-items:center; }
-  .feature .media{ position:relative; border-radius:var(--r-lg); overflow:hidden; aspect-ratio:4/3; border:1px solid var(--glass-line); }
-  .feature image-slot{ position:absolute; inset:0; }
-  .feature .badge{ position:absolute; left:16px; top:16px; z-index:3; }
+  .feature .media{ position:relative; border-radius:var(--r-lg); overflow:hidden; aspect-ratio:4/3; border:1px solid var(--glass-line); background:var(--void-2); }
+  .feature image-slot{ position:absolute; inset:0; width:100%; height:100%; }
+  .feature .badge{ position:absolute; left:16px; top:16px; z-index:5; background:color-mix(in oklab, var(--void) 70%, transparent); backdrop-filter:blur(8px); }
+
+  /* five-photo → one engraving collage */
+  .ts-collage{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:7px; padding:7px; }
+  .ts-collage .ph{ position:relative; overflow:hidden; border-radius:10px; background-image:url('assets/mountains-web.jpg');
+    background-size:cover; box-shadow:inset 0 0 0 1px rgba(255,255,255,.07); }
+  .ts-collage .ph::after{ content:attr(data-n); position:absolute; left:8px; bottom:6px; z-index:2;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; color:rgba(238,243,247,.82); }
+  .ts-collage .ph::before{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(7,9,12,0) 45%, rgba(7,9,12,.55)); }
+  .ts-collage .f1{ grid-column:1/3; grid-row:1/3; background-position:50% 28%; }
+  .ts-collage .f2{ grid-column:3/4; grid-row:1/2; background-position:72% 38%; }
+  .ts-collage .f3{ grid-column:3/4; grid-row:2/4; background-position:28% 62%; }
+  .ts-collage .f4{ grid-column:1/2; grid-row:3/4; background-position:18% 82%; }
+  .ts-collage .f5{ grid-column:2/3; grid-row:3/4; background-position:82% 68%; }
+  /* the hero frame doubles as the engraved-output preview */
+  .ts-collage .f1{ box-shadow:inset 0 0 0 1.5px var(--accent); }
+  .ts-collage .f1 .out{ position:absolute; inset:0; z-index:1; background-image:url('assets/mountains-web.jpg');
+    background-size:cover; background-position:50% 28%; filter:grayscale(1) contrast(2.6) brightness(1.05); opacity:.0;
+    animation:engraveFade 6s var(--ease) infinite; }
+  @keyframes engraveFade{ 0%,38%{ opacity:0; } 55%,82%{ opacity:.92; } 100%{ opacity:0; } }
+  .ts-result-tag{ position:absolute; right:12px; bottom:12px; z-index:6; }
   .section-head .eyebrow{ display:block; margin-bottom:16px; }
   .section-head h2{ font-size:clamp(30px,4.5vw,52px); max-width:18ch; }
   .section-head p{ margin-top:18px; }
@@ -172,7 +192,7 @@
   <div class="hero-copy">
     <span class="eyebrow">Lat 41.7°N · Lon 111.8°W · Stainless 304</span>
     <h1 class="display" data-headline>Carry where<br>you've been.</h1>
-    <p class="lead">Drop a photo or a sketch. We vectorize it for the laser in your browser — engraved onto a bottle built for the backcountry. One object, one story.</p>
+    <p class="lead">Drop a photo or a sketch. We vectorize it for the laser in your browser and wrap it around the whole bottle — a full 360° engraving on stainless built for the backcountry. One object, one story.</p>
   </div>
 
   <div class="hud tl">
@@ -181,8 +201,9 @@
     <div>24H COLD · 12H HOT</div>
   </div>
   <div class="hud bl">
-    <div><span class="dot"></span> DRAG TO ROTATE</div>
-    <div>SCROLL TO ZOOM</div>
+    <div><span class="dot"></span> DRAG BOTTLE TO ROTATE</div>
+    <div>SCROLL OVER BOTTLE TO ZOOM</div>
+    <div>360° FULL-WRAP ENGRAVING</div>
   </div>
   <div class="hud bc">LIVE ENGRAVING PREVIEW</div>
 
@@ -243,6 +264,15 @@
       </div>
     </div>
 
+    <div class="ctl-row">
+      <span class="step-label"><b>03</b> ENGRAVE AREA</span>
+      <div class="seg">
+        <button data-coverage="full" class="active">Full Wrap · 360°</button>
+        <button data-coverage="panel">Single Panel</button>
+      </div>
+      <div class="dz-s" style="font-size:11px; color:var(--ink-faint);">Engrave the entire bottle — top to base, all the way around — or keep it to one clean face.</div>
+    </div>
+
     <div class="divider"></div>
 
     <div class="buy-row">
@@ -282,12 +312,19 @@
     <div class="feature">
       <div class="media reveal">
         <span class="pill-tag badge"><span style="color:var(--accent)">AI</span>&nbsp; TRIP STUDIO</span>
-        <image-slot id="studio-teaser" src="assets/mountains-web.jpg" placeholder="Drop a trip photo"></image-slot>
+        <div class="ts-collage">
+          <div class="ph f1" data-n="01"><div class="out"></div></div>
+          <div class="ph f2" data-n="02"></div>
+          <div class="ph f3" data-n="03"></div>
+          <div class="ph f4" data-n="04"></div>
+          <div class="ph f5" data-n="05"></div>
+        </div>
+        <span class="pill-tag ts-result-tag"><span style="color:var(--accent)">5&nbsp;FRAMES</span>&nbsp;→ 1 BOTTLE</span>
       </div>
       <div class="section-head reveal">
         <span class="eyebrow">New — only possible with AI</span>
         <h2>Five photos from one trip, one engraving that tells it.</h2>
-        <p class="lead">Upload the shots from Zion, Yellowstone, a ridgeline at dawn. Trip Studio composes them into a single black-and-white line drawing built for steel — your whole journey on one bottle.</p>
+        <p class="lead">Upload the shots from Zion, Yellowstone, a ridgeline at dawn. Trip Studio composes all five into a single black-and-white drawing built for steel, then wraps it around the whole bottle — your entire journey on one object.</p>
         <div style="margin-top:28px; display:flex; gap:14px; flex-wrap:wrap;">
           <a class="btn btn-primary btn-lg" href="Trip Studio.html">Open Trip Studio <span class="ar">→</span></a>
           <a class="btn btn-ghost btn-lg" href="The Process.html">See the Process</a>

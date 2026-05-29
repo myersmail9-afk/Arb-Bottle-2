@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About — Lost Mountain</title>
+<meta name="description" content="Lost Mountain Engraving — a small Cache Valley, Utah outdoor company building a browser-native way to put your trips on a bottle." />
+<link rel="stylesheet" href="css/lost.css" />
+<style>
+  .a-hero{ position:relative; min-height:74svh; display:flex; align-items:flex-end; overflow:hidden; }
+  .a-hero image-slot{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .a-hero .scrim{ position:absolute; inset:0; z-index:1; background:linear-gradient(to top, var(--void) 4%, rgba(7,9,12,.4) 45%, rgba(7,9,12,.7)); }
+  .a-hero .wrap{ position:relative; z-index:2; padding:0 var(--pad) clamp(50px,8vh,90px); }
+  .a-hero h1{ font-size:clamp(44px,8vw,108px); max-width:14ch; }
+  .a-hero .lead{ margin-top:22px; }
+
+  .narrative{ max-width:760px; margin:0 auto; }
+  .narrative p{ font-size:clamp(18px,2vw,24px); line-height:1.6; color:var(--ink); margin-bottom:28px; }
+  .narrative p .dim{ color:var(--ink-dim); }
+  .narrative .first::first-letter{ font-family:var(--font-display); font-size:3.4em; float:left; line-height:.8; padding:6px 14px 0 0; color:var(--accent); }
+
+  .values{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:54px; }
+  .value{ padding:30px; }
+  .value .vn{ font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; color:var(--accent); }
+  .value h4{ font-size:20px; margin:14px 0 10px; }
+  .value p{ color:var(--ink-dim); font-size:14.5px; }
+
+  .stat-band{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:20px; }
+  .stat{ text-align:center; padding:24px; }
+  .stat .num{ font-family:var(--font-display); font-size:clamp(34px,5vw,56px); font-weight:600; letter-spacing:-.03em; color:var(--ink); }
+  .stat .lbl{ font-family:var(--font-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin-top:8px; }
+
+  @media (max-width:860px){ .values,.stat-band{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="void-bg"></div>
+<div class="topo-bg"></div>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/lost-logo-light.png" alt="Lost Mountain" />
+    <span class="wm">LOST MOUNTAIN <span>engraving</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Customize</a>
+    <a href="Trip Studio.html">Trip Studio</a>
+    <a href="The Process.html">Process</a>
+    <a href="About.html" class="active">About</a>
+    <a href="Reviews.html">Reviews</a>
+  </div>
+  <div class="nav-cta"><a class="btn btn-ghost" href="index.html">Customize a Bottle</a></div>
+</nav>
+
+<header class="a-hero">
+  <image-slot id="about-hero" src="assets/mountains-web.jpg" placeholder="Drop a hero adventure photo"></image-slot>
+  <div class="scrim"></div>
+  <div class="wrap">
+    <span class="eyebrow">Cache Valley, Utah · est. 2024</span>
+    <h1 class="display" style="margin-top:16px;">We don't sell bottles. We sell the trip back.</h1>
+    <p class="lead">A bottle is just stainless until it carries something — a ridgeline you climbed, a name you love, the coordinates of a day you'll never forget.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap narrative reveal">
+    <p class="first">Lost Mountain started with a frustration: every engraving shop online looked the same — a logo uploader, a three-day wait, an emailed proof you couldn't really see. <span class="dim">The machine had become a commodity. The taste hadn't.</span></p>
+    <p>So we built the thing we wished existed. A bottle that floats in front of you, that you can spin and zoom and actually <em>feel</em> before you buy. A vectorizer that turns your photo into laser-ready art the instant you drop it. A studio that takes five photos from a trip and composes them into one drawing worth keeping forever.</p>
+    <p class="dim">None of this was possible to build solo a year ago. The interface, the live 3D, the on-device image processing, the AI composition — this is a small outdoor company punching at a scale that used to require a team of ten. That's the whole point.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" style="display:block; margin-bottom:14px;">What we stand on</span>
+      <h2 style="font-size:clamp(28px,4vw,48px);">Premium, but never precious.</h2>
+    </div>
+    <div class="values">
+      <div class="value glass reveal"><div class="vn">01 · CRAFT</div><h4>Marked, not printed</h4><p>Fiber-laser engraving into 304 stainless — a single face or the full 360° wrap of the whole bottle. It outlasts the bottle, and we guarantee it for life.</p></div>
+      <div class="value glass reveal"><div class="vn">02 · CLARITY</div><h4>What you see is what ships</h4><p>The live preview is the proof. No surprise emails, no "that's not what I designed."</p></div>
+      <div class="value glass reveal"><div class="vn">03 · WILD</div><h4>Built for going places</h4><p>Designed for trailheads, summits, and glove boxes — not shelves. Carry it, dent it, love it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="stat-band">
+      <div class="stat glass reveal"><div class="num">5 day</div><div class="lbl">Average turnaround</div></div>
+      <div class="stat glass reveal"><div class="num">11</div><div class="lbl">Countries carried to</div></div>
+      <div class="stat glass reveal"><div class="num">∞</div><div class="lbl">Engraving guarantee</div></div>
+      <div class="stat glass reveal"><div class="num">100%</div><div class="lbl">On-device design</div></div>
+    </div>
+    <div class="center" style="margin-top:60px;">
+      <a class="btn btn-primary btn-lg reveal" href="index.html">Make One Yours <span class="ar">→</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="display:flex; align-items:center; gap:12px;">
+        <img src="assets/lost-logo-light.png" alt="" style="height:34px" />
+        <span class="wm" style="font-family:var(--font-display); font-weight:600;">LOST MOUNTAIN</span>
+      </div>
+      <p class="colophon">Custom-engraved bottles for people who go places.</p>
+    </div>
+    <div><h5>Shop</h5><a href="index.html">Customize a Bottle</a><a href="Trip Studio.html">AI Trip Studio</a><a href="#">Corporate / Bulk</a></div>
+    <div><h5>Company</h5><a href="About.html">Our Story</a><a href="The Process.html">The Process</a><a href="Reviews.html">Reviews</a></div>
+    <div><h5>Connect</h5><a href="http://www.instagram.com/lost_mountain_engraving/">Instagram</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span data-year>2026</span> Lost Mountain Engraving · All Rights Reserved</span>
+    <span>41.7370° N, 111.8338° W</span>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
