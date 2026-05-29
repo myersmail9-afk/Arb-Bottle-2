@@ -150,24 +150,18 @@
   .review p{ font-size:15px; color:var(--ink); line-height:1.6; }
   .review .who{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase; }
 
-  /* hero CTA (hero-copy itself is click-through; buttons opt back in) */
-  .hero-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:32px; pointer-events:auto; }
   .c-head-btns{ display:flex; gap:8px; }
-  .customizer{ transition:transform .55s var(--ease), opacity .45s var(--ease); }
+  #close-customizer{ display:none; }
 
-  /* hero entrance on load */
+  /* hero CTA only appears on mobile (where the customizer is a slide-up sheet);
+     on desktop the customizer is always visible on the right, so it's hidden. */
+  .hero-cta{ display:none; gap:14px; flex-wrap:wrap; margin-top:30px; pointer-events:auto; }
+
+  /* hero entrance on load — both the left copy and the right customizer stay visible */
   .hero-copy > *{ animation:heroIn .95s var(--ease) both; }
   .hero-copy h1{ animation-delay:.08s; }
   .hero-copy .lead{ animation-delay:.16s; }
-  .hero-copy .hero-cta{ animation-delay:.24s; }
   @keyframes heroIn{ from{ opacity:0; transform:translateY(22px); } to{ opacity:1; transform:none; } }
-
-  /* DESKTOP: customizer slides in on intent; the bottle owns the clean hero */
-  @media (min-width:861px){
-    .customizer{ transform:translateY(-50%) translateX(118%); opacity:0; pointer-events:none; }
-    .stage.designing .customizer{ transform:translateY(-50%) translateX(0); opacity:1; pointer-events:auto; }
-    .stage.designing .hero-copy{ opacity:0; transform:translateX(-26px); transition:opacity .4s var(--ease), transform .5s var(--ease); pointer-events:none; }
-  }
 
   @media (max-width:980px){
     .feature{ grid-template-columns:1fr; gap:30px; }
@@ -176,12 +170,15 @@
   @media (max-width:860px){
     .stage{ height:auto; min-height:0; display:flex; flex-direction:column; }
     #bottle-canvas{ position:relative; height:62svh; }
-    .hero-copy{ position:relative; left:0; top:0; max-width:none; padding:84px var(--pad) 24px; }
+    .hero-copy{ position:relative; left:0; top:0; max-width:none; padding:84px var(--pad) 8px; }
+    .hero-cta{ display:flex; }
+    #close-customizer{ display:inline-block; }
     .hud,.scroll-cue{ display:none !important; }
-    /* MOBILE: customizer is a slide-up bottom sheet, so the bottle stays visible */
+    /* MOBILE only: customizer is a slide-up bottom sheet so the bottle stays visible */
     .customizer{ position:fixed; left:0; right:0; bottom:0; top:auto; width:100%; max-width:none;
       max-height:88svh; overflow-y:auto; margin:0; z-index:90; border-radius:var(--r-lg) var(--r-lg) 0 0;
-      transform:translateY(110%); opacity:1; box-shadow:0 -20px 60px -20px rgba(0,0,0,.85); -webkit-overflow-scrolling:touch; }
+      transform:translateY(110%); transition:transform .5s var(--ease); opacity:1;
+      box-shadow:0 -20px 60px -20px rgba(0,0,0,.85); -webkit-overflow-scrolling:touch; }
     .stage.designing .customizer{ transform:translateY(0); }
     .customizer .c-head{ position:sticky; top:0; }
   }
@@ -217,10 +214,10 @@
   <div class="hero-copy">
     <span class="eyebrow">Lat 41.7°N · Lon 111.8°W · Stainless 304</span>
     <h1 class="display" data-headline>Carry where<br>you've been.</h1>
-    <p class="lead">Drop a photo or a sketch. We vectorize it for the laser in your browser and wrap it around the whole bottle — a full 360° engraving on stainless built for the backcountry. One object, one story.</p>
+    <p class="lead">Vectorized in your browser and wrapped 360° around the whole bottle. One object, one story.</p>
     <div class="hero-cta">
       <button class="btn btn-primary btn-lg" data-open-customizer>Design yours <span class="ar">→</span></button>
-      <a class="btn btn-ghost btn-lg" href="Trip Studio.html">Try Trip Studio</a>
+      <a class="btn btn-ghost btn-lg" href="Trip Studio.html">Trip Studio</a>
     </div>
   </div>
 
@@ -228,11 +225,11 @@
     <div class="big"><span class="dot"></span> SUMMIT 32&nbsp;OZ</div>
     <div>DOUBLE-WALL VACUUM</div>
     <div>24H COLD · 12H HOT</div>
+    <div>360° FULL-WRAP ENGRAVING</div>
   </div>
   <div class="hud bl">
-    <div><span class="dot"></span> DRAG BOTTLE TO ROTATE</div>
-    <div>SCROLL OVER BOTTLE TO ZOOM</div>
-    <div>360° FULL-WRAP ENGRAVING</div>
+    <div><span class="dot"></span> DRAG TO ROTATE</div>
+    <div>SCROLL OVER TO ZOOM</div>
   </div>
   <div class="hud bc">LIVE ENGRAVING PREVIEW</div>
 
