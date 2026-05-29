@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lost Mountain — Engrave your bottle</title>
+<meta name="description" content="Custom laser-engraved stainless bottles. Drop a photo or sketch, vectorize it live in your browser, and order it engraved on a bottle built for the backcountry." />
+<link rel="stylesheet" href="css/lost.css" />
+<style>
+  /* ---------- hero stage ---------- */
+  .stage{ position:relative; height:100svh; min-height:680px; width:100%; overflow:hidden; }
+  #bottle-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; touch-action:none; }
+  #bottle-canvas:active{ cursor:grabbing; }
+  .stage.dragging::after{
+    content:"DROP TO ENGRAVE"; position:absolute; inset:18px; z-index:30;
+    border:2px dashed var(--accent); border-radius:var(--r-lg);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); letter-spacing:.3em; color:var(--accent);
+    background:color-mix(in oklab, var(--accent) 8%, transparent); pointer-events:none;
+  }
+
+  .hero-copy{
+    position:absolute; left:var(--pad); top:clamp(96px,15vh,150px); z-index:15; max-width:min(46vw,520px);
+    pointer-events:none;
+  }
+  .hero-copy .eyebrow{ margin-bottom:18px; display:block; }
+  .hero-copy h1{ color:var(--ink); }
+  .hero-copy .lead{ margin-top:20px; }
+
+  /* HUD */
+  .hud.tl{ top:clamp(96px,15vh,150px); right:var(--pad); text-align:right; flex-direction:column; align-items:flex-end; gap:5px; }
+  .hud.bl{ left:var(--pad); bottom:30px; flex-direction:column; align-items:flex-start; gap:6px; }
+  .hud.bc{ left:50%; transform:translateX(-50%); bottom:30px; }
+  .hud .big{ font-size:13px; color:var(--ink-dim); letter-spacing:.14em; }
+
+  /* ---------- customizer panel ---------- */
+  .customizer{
+    position:absolute; right:var(--pad); top:50%; transform:translateY(-50%);
+    width:380px; max-width:calc(100vw - var(--pad)*2); z-index:25;
+    padding:26px; display:flex; flex-direction:column; gap:18px;
+  }
+  .customizer .c-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .customizer h3{ font-size:21px; }
+  .customizer .c-head .eyebrow{ font-size:10px; letter-spacing:.28em; }
+  .step-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:8px; }
+  .step-label b{ color:var(--accent); font-weight:400; }
+
+  .dropzone{
+    border:1.5px dashed var(--glass-line); border-radius:var(--r-md);
+    padding:22px 16px; text-align:center; cursor:pointer;
+    transition:border-color .25s var(--ease), background .25s; background:rgba(255,255,255,.02);
+  }
+  .dropzone:hover{ border-color:var(--accent); background:color-mix(in oklab, var(--accent) 6%, transparent); }
+  .dropzone .dz-ic{ width:40px; height:40px; margin:0 auto 10px; color:var(--accent); }
+  .dropzone .dz-t{ font-weight:700; font-size:14px; color:var(--ink); }
+  .dropzone .dz-s{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
+
+  .design-state{ display:none; flex-direction:column; gap:16px; }
+  .design-state.has-art{ display:flex; }
+  .has-art ~ .dropzone, .design-state.has-art + .dropzone{ display:none; }
+
+  .art-chip{ display:flex; align-items:center; gap:10px; justify-content:space-between;
+    background:rgba(255,255,255,.04); border:1px solid var(--glass-line); border-radius:var(--r-pill); padding:8px 8px 8px 14px; }
+  .art-chip .nm{ font-size:13px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .art-chip .nm small{ display:block; font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); letter-spacing:.1em; font-weight:400; }
+  .mini-btn{ font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-dim);
+    background:rgba(255,255,255,.06); border:1px solid var(--glass-line); border-radius:var(--r-pill); padding:7px 12px; cursor:pointer; transition:.2s; }
+  .mini-btn:hover{ color:var(--ink); background:rgba(255,255,255,.12); }
+
+  .ctl-row{ display:flex; flex-direction:column; gap:9px; }
+  .ctl-row .rh{ display:flex; align-items:center; justify-content:space-between; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:4px;
+    background:linear-gradient(90deg, var(--accent) var(--p,55%), rgba(255,255,255,.12) var(--p,55%)); outline:none; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+    background:var(--ink); border:3px solid var(--accent); cursor:pointer; box-shadow:0 0 10px var(--accent-glow); }
+  input[type=range]::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:var(--ink); border:3px solid var(--accent); cursor:pointer; }
+
+  .toggle{ display:flex; gap:8px; }
+  .seg{ display:flex; background:rgba(255,255,255,.04); border:1px solid var(--glass-line); border-radius:var(--r-pill); padding:3px; gap:3px; }
+  .seg button{ flex:1; font-family:var(--font-body); font-weight:700; font-size:12px; color:var(--ink-dim);
+    background:transparent; border:none; padding:8px 10px; border-radius:var(--r-pill); cursor:pointer; transition:.2s; letter-spacing:.02em; }
+  .seg button.active{ background:var(--accent); color:var(--accent-ink); }
+  .invert-btn.on{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+
+  .swatches{ display:flex; gap:9px; }
+  .swatch{ width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); transition:.2s; position:relative; }
+  .swatch.active{ border-color:var(--accent); transform:scale(1.08); }
+  .swatch:hover{ transform:scale(1.1); }
+
+  .buy-row{ display:flex; align-items:center; gap:14px; }
+  .qty{ display:flex; align-items:center; gap:0; border:1px solid var(--glass-line); border-radius:var(--r-pill); background:rgba(255,255,255,.03); }
+  .qty button{ width:34px; height:38px; background:none; border:none; color:var(--ink-dim); font-size:18px; cursor:pointer; transition:.15s; }
+  .qty button:hover{ color:var(--ink); }
+  .qty .v{ font-family:var(--font-mono); font-size:14px; min-width:26px; text-align:center; color:var(--ink); }
+  .price{ font-family:var(--font-display); font-size:30px; font-weight:600; color:var(--ink); letter-spacing:-.02em; }
+  .price small{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); display:block; letter-spacing:.1em; font-weight:400; }
+  .buy-note{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; color:var(--ink-faint); text-transform:uppercase; text-align:center; }
+
+  /* toast */
+  .toast{ position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(140%); z-index:200;
+    padding:15px 22px; max-width:min(90vw,520px); font-size:14px; color:var(--ink); border-radius:var(--r-pill);
+    transition:transform .5s var(--ease); }
+  .toast.show{ transform:translateX(-50%) translateY(0); }
+
+  /* scroll cue */
+  .scroll-cue{ position:absolute; left:50%; bottom:84px; transform:translateX(-50%); z-index:14;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.3em; color:var(--ink-faint); text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.8; }
+  .scroll-cue .ln{ width:1px; height:34px; background:linear-gradient(var(--accent), transparent); animation:cue 2s var(--ease) infinite; }
+  @keyframes cue{ 0%{ transform:scaleY(0); transform-origin:top; } 50%{ transform:scaleY(1); transform-origin:top; } 51%{ transform-origin:bottom; } 100%{ transform:scaleY(0); transform-origin:bottom; } }
+
+  /* ---------- below-fold sections ---------- */
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:26px; margin-top:54px; }
+  .step{ padding:30px 26px; }
+  .step .n{ font-family:var(--font-mono); font-size:12px; color:var(--accent); letter-spacing:.2em; }
+  .step h4{ font-size:20px; margin:16px 0 10px; }
+  .step p{ color:var(--ink-dim); font-size:14.5px; }
+
+  .feature{ display:grid; grid-template-columns:1.05fr .95fr; gap:54px; align-items:center; }
+  .feature .media{ position:relative; border-radius:var(--r-lg); overflow:hidden; aspect-ratio:4/3; border:1px solid var(--glass-line); }
+  .feature image-slot{ position:absolute; inset:0; }
+  .feature .badge{ position:absolute; left:16px; top:16px; z-index:3; }
+  .section-head .eyebrow{ display:block; margin-bottom:16px; }
+  .section-head h2{ font-size:clamp(30px,4.5vw,52px); max-width:18ch; }
+  .section-head p{ margin-top:18px; }
+
+  .reviews{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:50px; }
+  .review{ padding:26px; display:flex; flex-direction:column; gap:16px; }
+  .review .stars{ color:var(--accent); letter-spacing:3px; font-size:13px; }
+  .review p{ font-size:15px; color:var(--ink); line-height:1.6; }
+  .review .who{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase; }
+
+  @media (max-width:980px){
+    .feature{ grid-template-columns:1fr; gap:30px; }
+    .steps,.reviews{ grid-template-columns:1fr; }
+  }
+  @media (max-width:860px){
+    .stage{ height:auto; min-height:0; display:flex; flex-direction:column; }
+    #bottle-canvas{ position:relative; height:56svh; }
+    .hero-copy{ position:relative; left:0; top:0; max-width:none; padding:90px var(--pad) 0; }
+    .customizer{ position:relative; right:0; top:0; transform:none; width:100%; margin:18px auto 30px; }
+    .hud,.scroll-cue{ display:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="void-bg"></div>
+<div class="topo-bg"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/lost-logo-light.png" alt="Lost Mountain" />
+    <span class="wm">LOST MOUNTAIN <span>engraving</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Customize</a>
+    <a href="Trip Studio.html">Trip Studio</a>
+    <a href="The Process.html">Process</a>
+    <a href="About.html">About</a>
+    <a href="Reviews.html">Reviews</a>
+  </div>
+  <div class="nav-cta">
+    <a class="btn btn-ghost" href="#customize">Start a Design</a>
+  </div>
+</nav>
+
+<!-- HERO STAGE -->
+<header class="stage" id="stage">
+  <canvas id="bottle-canvas"></canvas>
+
+  <div class="hero-copy">
+    <span class="eyebrow">Lat 41.7°N · Lon 111.8°W · Stainless 304</span>
+    <h1 class="display" data-headline>Carry where<br>you've been.</h1>
+    <p class="lead">Drop a photo or a sketch. We vectorize it for the laser in your browser — engraved onto a bottle built for the backcountry. One object, one story.</p>
+  </div>
+
+  <div class="hud tl">
+    <div class="big"><span class="dot"></span> SUMMIT 32&nbsp;OZ</div>
+    <div>DOUBLE-WALL VACUUM</div>
+    <div>24H COLD · 12H HOT</div>
+  </div>
+  <div class="hud bl">
+    <div><span class="dot"></span> DRAG TO ROTATE</div>
+    <div>SCROLL TO ZOOM</div>
+  </div>
+  <div class="hud bc">LIVE ENGRAVING PREVIEW</div>
+
+  <!-- CUSTOMIZER -->
+  <aside class="customizer glass" id="customize">
+    <div class="c-head">
+      <div>
+        <span class="eyebrow">CUSTOMIZE · LIVE</span>
+        <h3>Design your bottle</h3>
+      </div>
+      <button class="mini-btn" id="reset-view" title="Reset view">RESET</button>
+    </div>
+
+    <div class="step-label"><b>01</b> UPLOAD ARTWORK</div>
+
+    <div class="design-state" id="design-state">
+      <div class="art-chip">
+        <div class="nm" id="design-name">your-design<small>VECTORIZED · READY</small></div>
+        <button class="mini-btn" id="reupload">Replace</button>
+      </div>
+      <div class="ctl-row" id="threshold-wrap">
+        <div class="rh">
+          <span class="step-label">DETAIL THRESHOLD</span>
+          <button class="mini-btn invert-btn" id="invert">Invert</button>
+        </div>
+        <input type="range" id="threshold" min="20" max="235" value="135" />
+      </div>
+    </div>
+
+    <label class="dropzone" id="dropzone" for="file-input">
+      <svg class="dz-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 16V4m0 0L7 9m5-5l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round"/>
+      </svg>
+      <div class="dz-t">Drop a PNG or photo</div>
+      <div class="dz-s">We vectorize it for the laser, live</div>
+    </label>
+    <input type="file" id="file-input" accept="image/*" hidden />
+
+    <div class="divider"></div>
+
+    <div class="ctl-row">
+      <span class="step-label"><b>02</b> BOTTLE FINISH</span>
+      <div class="swatches">
+        <div class="swatch active" data-bottle="#c3cad2" data-cap="#11161d" style="background:#c3cad2" title="Brushed Steel"></div>
+        <div class="swatch" data-bottle="#1b1f24" data-cap="#0a0c0f" style="background:#1b1f24" title="Carbon"></div>
+        <div class="swatch" data-bottle="#6f7d6a" data-cap="#2a3026" style="background:#6f7d6a" title="Sage"></div>
+        <div class="swatch" data-bottle="#c8b59a" data-cap="#3a3228" style="background:#c8b59a" title="Sand"></div>
+        <div class="swatch" data-bottle="#4a6b82" data-cap="#16222b" style="background:#4a6b82" title="Coast"></div>
+      </div>
+    </div>
+
+    <div class="ctl-row">
+      <span class="step-label">ENGRAVING STYLE</span>
+      <div class="seg">
+        <button data-engrave="laser" class="active">Laser Mark</button>
+        <button data-engrave="etched">Etched</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="buy-row">
+      <div class="qty">
+        <button data-qty="-1">−</button>
+        <span class="v" id="qty-val">01</span>
+        <button data-qty="1">+</button>
+      </div>
+      <div class="price" id="price">$48<small>FREE SHIPPING</small></div>
+      <button class="btn btn-primary" id="buy" style="margin-left:auto">Purchase <span class="ar">→</span></button>
+    </div>
+    <div class="buy-note">Stainless 304 · Ships in 5 days · Lifetime engraving guarantee</div>
+  </aside>
+
+  <div class="scroll-cue">SCROLL<div class="ln"></div></div>
+</header>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The whole thing happens up there ↑</span>
+      <h2>No design files. No back-and-forth. No waiting on a proof.</h2>
+      <p class="lead">Most engraving shops make you email a logo and wait three days for a mockup. We do it in the browser, on the bottle, in real time.</p>
+    </div>
+    <div class="steps">
+      <div class="step glass reveal"><div class="n">01 / UPLOAD</div><h4>Drop any image</h4><p>A trail photo, a hand sketch, a logo, a topo line. Anything with shape works.</p></div>
+      <div class="step glass reveal"><div class="n">02 / VECTORIZE</div><h4>It converts, live</h4><p>Your image becomes clean two-tone laser art on your machine — slide the threshold until it's right.</p></div>
+      <div class="step glass reveal"><div class="n">03 / OWN IT</div><h4>Spin it, buy it</h4><p>Rotate the bottle, check the wrap, pick your finish, order. It ships engraved exactly like the preview.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIP STUDIO TEASER -->
+<section class="section">
+  <div class="wrap">
+    <div class="feature">
+      <div class="media reveal">
+        <span class="pill-tag badge"><span style="color:var(--accent)">AI</span>&nbsp; TRIP STUDIO</span>
+        <image-slot id="studio-teaser" src="assets/mountains-web.jpg" placeholder="Drop a trip photo"></image-slot>
+      </div>
+      <div class="section-head reveal">
+        <span class="eyebrow">New — only possible with AI</span>
+        <h2>Five photos from one trip, one engraving that tells it.</h2>
+        <p class="lead">Upload the shots from Zion, Yellowstone, a ridgeline at dawn. Trip Studio composes them into a single black-and-white line drawing built for steel — your whole journey on one bottle.</p>
+        <div style="margin-top:28px; display:flex; gap:14px; flex-wrap:wrap;">
+          <a class="btn btn-primary btn-lg" href="Trip Studio.html">Open Trip Studio <span class="ar">→</span></a>
+          <a class="btn btn-ghost btn-lg" href="The Process.html">See the Process</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head center reveal" style="margin:0 auto;">
+      <span class="eyebrow">Carried to 11 countries &amp; counting</span>
+      <h2 style="margin:0 auto;">People don't buy a bottle. They buy the trip back.</h2>
+    </div>
+    <div class="reviews">
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"Put the GPS line from my AT thru-hike on a Carbon bottle. Strangers ask about it at every trailhead."</p><div class="who">— Dana R. · Asheville, NC</div></div>
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"Ordered 40 for a summit retreat. The live preview meant zero proofing emails. Showed up flawless."</p><div class="who">— Mateo L. · Ops, Northpeak</div></div>
+      <div class="review glass reveal"><div class="stars">★★★★★</div><p>"Turned my kid's drawing of our campsite into an etched bottle. I will never not tear up using it."</p><div class="who">— Priya S. · Bend, OR</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="display:flex; align-items:center; gap:12px;">
+        <img src="assets/lost-logo-light.png" alt="" style="height:34px" />
+        <span class="wm" style="font-family:var(--font-display); font-weight:600;">LOST MOUNTAIN</span>
+      </div>
+      <p class="colophon">Custom-engraved bottles for people who go places. Designed in the browser, made in Cache Valley, Utah.</p>
+    </div>
+    <div><h5>Shop</h5><a href="index.html">Customize a Bottle</a><a href="Trip Studio.html">AI Trip Studio</a><a href="#">Gift Cards</a><a href="#">Corporate / Bulk</a></div>
+    <div><h5>Company</h5><a href="About.html">Our Story</a><a href="The Process.html">The Process</a><a href="Reviews.html">Reviews</a><a href="#">Sustainability</a></div>
+    <div><h5>Connect</h5><a href="http://www.instagram.com/lost_mountain_engraving/">Instagram</a><a href="#">Contact</a><a href="#">Returns &amp; Guarantee</a><a href="#">Track an Order</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span data-year>2026</span> Lost Mountain Engraving · All Rights Reserved</span>
+    <span>41.7370° N, 111.8338° W</span>
+  </div>
+</footer>
+
+<!-- 3D + app -->
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/image-slot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
